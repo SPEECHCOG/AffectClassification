@@ -2,7 +2,7 @@
 
 The python code files and data for running affect classification experiments on spontaneous speech features and data. There are three different experiments implemented. Unpack the data.zip, all the available data should then be in a directory called "data".
 
-The data used for SVM experiments consists of eGeMAPSv02 features calculated using the original raw audio, ExHuBERT SER posteriors calculated using the original raw audio and FinnSentiment posteriors using the original audio transcripts. 
+The data used for SVM experiments consists of eGeMAPSv02 features calculated using the original raw audio, previously calculated SER posteriors using the original raw audio and text sentiment posteriors using the original audio transcripts. 
 
 The data used for ExHuBERT experiments (classification with and without fine-tuning) should be conducted using raw audio samples, which are not shared at this moment because of data licensing reasons (we're working on it!). The data shared here at this moment (7.4.2025) is dummy data with the same array-structure as the actual data. The content is normally distributed noise. 
 
