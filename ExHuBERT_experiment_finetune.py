@@ -5,8 +5,6 @@ Created on Fri Jan  3 12:30:32 2025
 
 @author: Kalle Lahtinen, kalle.t.lahtinen@tuni.fi
 
-To be used with the Affective Speech Corpus for Spontaneous Finnish created in 2024 / 2025
-
 This script uses the ExHuBERT model to predict high and low arousal and high, low and 
 neutral valence from raw audio waveforms. The model is downloaded from the Huggingface service
 and used for first fine-tuning the model for predicting affect from spontaneous speech data and
