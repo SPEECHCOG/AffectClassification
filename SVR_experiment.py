@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  7 16:30:00 2025
+Created on Mon Sep  1 16:30:00 2025
 
 @author: Kalle Lahtinen, kalle.t.lahtinen@tuni.fi
 
-This script implements the functions to execute training and testing for a Support Vector Machine classifier. 
-The expected data is read in from csv-files, that contain the training and testing features as well as the 
-sample labels for high and low arousal as well as high, low and neutral valence. The script trains two separate 
-classifiers for predicting the affect related discrete labels for arousal and valence.
+This script implements the functions to execute training and testing for a Support Vector Machine regressor. 
+The expected data is read in from csv-files, that contain the training and testing features as well as the continuous 
+sample labels arousal and valence. The script trains two separate 
+regressors for predicting the affect related continuous labels for arousal and valence.
     
 """
 
