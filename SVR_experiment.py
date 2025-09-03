@@ -16,13 +16,12 @@ import numpy as np
 import sys
 import os
 import pandas as pd
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import cross_validate
 from sklearn import svm
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.preprocessing import StandardScaler
 import classification_scores
 from sklearn.metrics import make_scorer
-
 
 def concordance_correlation_coefficient(y_true, y_pred):
     """Concordance correlation coefficient."""
@@ -52,6 +51,13 @@ def concordance_correlation_coefficient(y_true, y_pred):
     denominator = var_true + var_pred + (mean_true - mean_pred)**2
 
     return numerator / denominator
+
+
+def ccc_for_scorer(y_true, y_pred):
+    
+    score = concordance_correlation_coefficient(y_true, y_pred)
+    
+    return score
     
 if __name__ == '__main__':
     
@@ -63,7 +69,7 @@ if __name__ == '__main__':
     #continuous or discrete labels, in this script always discrete
     label_type = "continuous"
     #perform grid search or just train one classifier without grid search
-    grid_search = False
+    grid_search = True
         
     #Read in annotations for training (tr_val -files) and testing (gold_std -files) the classifier
     valence_gold_std = pd.read_csv(data_storage_dir+"/"+label_type+"_valence_gold_std.csv")
@@ -107,6 +113,7 @@ if __name__ == '__main__':
     #arousal training and testing labels
     arousal_annotated_tr_labels = arousal_tr_val.loc[~arousal_tr_val["annotation_mean"].isna(), "a_propagated"]
     arousal_GS_labels = arousal_gold_std["annotation_mean"]
+    
 
     #Cast the data to numpy arrays, z-score normalize (zero mean, unit variance) the data
     X_train = tr_val_features.to_numpy()
@@ -116,8 +123,11 @@ if __name__ == '__main__':
     X_train = sc.transform(X_train)
     X_test = sc.transform(X_test)
     
+    # Wrap the custom scoring function
+    ccc_scorer = make_scorer(ccc_for_scorer)
     
-    #SVM training and testing for arousal, 
+    
+    #SVR training and testing for arousal, 
     #get arousal labels
     y_train = arousal_annotated_tr_labels.to_numpy()
     y_test = arousal_GS_labels.to_numpy()
@@ -127,16 +137,35 @@ if __name__ == '__main__':
                       'svr_rbf': svm.SVR(kernel='rbf'),
                       'svr_poly': svm.SVR(kernel='poly')}
         
+        cv_mean_scores = []
+        cv_scores = []
+        cv_regressors = []
+        
         for regr_name, regr in regressors.items():
-            regr.fit(X_train, y_train)
             
-            y_pred = regr.predict(X_test)
+            scores = cross_validate(regr, X_train, y_train, cv=5, scoring=ccc_scorer)
             
-            print(regr_name+" arousal scores: ")
-            #print(mean_squared_error(y_test, y_pred))
-            #print(mean_absolute_error(y_test, y_pred))
-            #print(r2_score(y_test, y_pred))
-            print(concordance_correlation_coefficient(y_test, y_pred))
+            cv_scores.append(scores["test_score"])
+            
+            mean_score = np.mean(scores["test_score"])
+            
+            cv_mean_scores.append(mean_score)
+            cv_regressors.append(regr_name)
+            
+            #regr.fit(X_train, y_train)
+            
+            
+        regr = regressors[cv_regressors[np.argmax(cv_mean_scores)]]
+        regr = regr.fit(X_train, y_train)
+        y_pred = regr.predict(X_test)
+        
+        
+        print("Best arousal regressor during CV: "+cv_regressors[np.argmax(cv_mean_scores)])
+        print(cv_regressors[np.argmax(cv_mean_scores)]+" arousal CV scores: ")
+        #print(mean_squared_error(y_test, y_pred))
+        #print(mean_absolute_error(y_test, y_pred))
+        #print(r2_score(y_test, y_pred))
+        print(concordance_correlation_coefficient(y_test, y_pred))
     
     
     
@@ -150,7 +179,7 @@ if __name__ == '__main__':
         print("Arousal scores: ")
         print(concordance_correlation_coefficient(y_test, y_pred))
     
-    #SVM training and testing for valence
+    #SVR training and testing for valence
     y_train = valence_annotated_tr_labels.to_numpy()
     y_test = valence_GS_labels.to_numpy()
     
@@ -159,21 +188,40 @@ if __name__ == '__main__':
                       'svr_rbf': svm.SVR(kernel='rbf'),
                       'svr_poly': svm.SVR(kernel='poly')}
         
+        cv_mean_scores = []
+        cv_scores = []
+        cv_regressors = []
+        
         for regr_name, regr in regressors.items():
-            regr.fit(X_train, y_train)
             
-            y_pred = regr.predict(X_test)
+            scores = cross_validate(regr, X_train, y_train, cv=5, scoring=ccc_scorer)
             
-            print(regr_name+" valence scores: ")
-            #print(mean_squared_error(y_test, y_pred))
-            #print(mean_absolute_error(y_test, y_pred))
-            #print(r2_score(y_test, y_pred))
-            print(concordance_correlation_coefficient(y_test, y_pred))
+            cv_scores.append(scores["test_score"])
+            
+            mean_score = np.mean(scores["test_score"])
+            
+            cv_mean_scores.append(mean_score)
+            cv_regressors.append(regr_name)
+            
+            #regr.fit(X_train, y_train)
+            
+            
+        regr = regressors[cv_regressors[np.argmax(cv_mean_scores)]]
+        regr = regr.fit(X_train, y_train)
+        y_pred = regr.predict(X_test)
+        
+        
+        print("Best valence regressor during CV: "+cv_regressors[np.argmax(cv_mean_scores)])
+        print(cv_regressors[np.argmax(cv_mean_scores)]+" valence CV scores: ")
+        #print(mean_squared_error(y_test, y_pred))
+        #print(mean_absolute_error(y_test, y_pred))
+        #print(r2_score(y_test, y_pred))
+        print(concordance_correlation_coefficient(y_test, y_pred))
     
     
     else:
     
-        regr = svm.SVR(kernel='linear')
+        regr = svm.SVR(kernel='rbf')
         regr.fit(X_train, y_train)
         
         y_pred = regr.predict(X_test)

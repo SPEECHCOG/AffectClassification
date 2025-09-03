@@ -117,7 +117,7 @@ if __name__ == '__main__':
         param_grid = [svm_linear, svm_others]
         
         # Perform GridSearchCV
-        grid_search = GridSearchCV(estimator=clf, param_grid=param_grid, cv=5, scoring=uar_scorer, verbose=2)
+        grid_search = GridSearchCV(estimator=clf, param_grid=param_grid, cv=5, scoring=uar_scorer, verbose=1)
         
         # Fit GridSearchCV
         grid_search.fit(X_train, y_train)
@@ -173,7 +173,7 @@ if __name__ == '__main__':
         param_grid = [svm_linear, svm_others]
         
         # Perform GridSearchCV
-        grid_search = GridSearchCV(estimator=clf, param_grid=param_grid, cv=5, scoring=uar_scorer, verbose=2)
+        grid_search = GridSearchCV(estimator=clf, param_grid=param_grid, cv=5, scoring=uar_scorer, verbose=1)
         
         # Fit GridSearchCV
         grid_search.fit(X_train, y_train)
