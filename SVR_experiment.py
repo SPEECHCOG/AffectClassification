@@ -135,7 +135,8 @@ if __name__ == '__main__':
     if grid_search: 
         regressors = {'svr_linear': svm.SVR(kernel='linear'),
                       'svr_rbf': svm.SVR(kernel='rbf'),
-                      'svr_poly': svm.SVR(kernel='poly')}
+                      'svr_poly': svm.SVR(kernel='poly'), 
+                      'svr_sigmoid': svm.SVR(kernel='sigmoid')}
         
         cv_mean_scores = []
         cv_scores = []
@@ -186,7 +187,8 @@ if __name__ == '__main__':
     if grid_search: 
         regressors = {'svr_linear': svm.SVR(kernel='linear'),
                       'svr_rbf': svm.SVR(kernel='rbf'),
-                      'svr_poly': svm.SVR(kernel='poly')}
+                      'svr_poly': svm.SVR(kernel='poly'), 
+                      'svr_sigmoid': svm.SVR(kernel='sigmoid')}
         
         cv_mean_scores = []
         cv_scores = []
