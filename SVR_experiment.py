@@ -16,7 +16,7 @@ import numpy as np
 import sys
 import os
 import pandas as pd
-from sklearn.model_selection import cross_validate
+from sklearn.model_selection import cross_validate, GridSearchCV
 from sklearn import svm
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.preprocessing import StandardScaler
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     #continuous or discrete labels, in this script always discrete
     label_type = "continuous"
     #perform grid search or just train one classifier without grid search
-    grid_search = True
+    grid_search = False
         
     #Read in annotations for training (tr_val -files) and testing (gold_std -files) the classifier
     valence_gold_std = pd.read_csv(data_storage_dir+"/"+label_type+"_valence_gold_std.csv")
@@ -133,101 +133,94 @@ if __name__ == '__main__':
     y_test = arousal_GS_labels.to_numpy()
     
     if grid_search: 
-        regressors = {'svr_linear': svm.SVR(kernel='linear'),
-                      'svr_rbf': svm.SVR(kernel='rbf'),
-                      'svr_poly': svm.SVR(kernel='poly'), 
-                      'svr_sigmoid': svm.SVR(kernel='sigmoid')}
         
-        cv_mean_scores = []
-        cv_scores = []
-        cv_regressors = []
+        clf = svm.SVR()
         
-        for regr_name, regr in regressors.items():
-            
-            scores = cross_validate(regr, X_train, y_train, cv=5, scoring=ccc_scorer)
-            
-            cv_scores.append(scores["test_score"])
-            
-            mean_score = np.mean(scores["test_score"])
-            
-            cv_mean_scores.append(mean_score)
-            cv_regressors.append(regr_name)
-            
-            #regr.fit(X_train, y_train)
-            
-            
-        regr = regressors[cv_regressors[np.argmax(cv_mean_scores)]]
-        regr = regr.fit(X_train, y_train)
-        y_pred = regr.predict(X_test)
+        svr_linear = {'C': [0.1, 1, 10], 
+              'kernel': ['linear']} 
+        svr_others = {'C': [0.1, 1, 10],
+              'gamma': ['auto', 'scale'], 
+              'kernel': ['poly', 'rbf', 'sigmoid']}
         
+        param_grid = [svr_linear, svr_others]
         
-        print("Best arousal regressor during CV: "+cv_regressors[np.argmax(cv_mean_scores)])
-        print(cv_regressors[np.argmax(cv_mean_scores)]+" arousal CV scores: ")
-        #print(mean_squared_error(y_test, y_pred))
-        #print(mean_absolute_error(y_test, y_pred))
-        #print(r2_score(y_test, y_pred))
-        print(concordance_correlation_coefficient(y_test, y_pred))
+        # Perform GridSearchCV
+        grid_search = GridSearchCV(estimator=clf, param_grid=param_grid, cv=5, scoring=ccc_scorer, verbose=1)
+        
+        # Fit GridSearchCV
+        grid_search.fit(X_train, y_train)
+        
+        # Display best parameters and best score
+        print("Best Parameters:", grid_search.best_params_)
+        print("Best Cross-Validation CCC:", grid_search.best_score_)
+        
+        # Evaluate the best model on the test set
+        best_model_ar = grid_search.best_estimator_
+        best_model_ar.fit(X_train, y_train)
+        y_pred_ar = best_model_ar.predict(X_test)
+
+        print("\nArousal ccc:\n")
+        print(concordance_correlation_coefficient(y_test, y_pred_ar))
     
     
     
+    #train and test SVR regressor with constant parameters
     else:
-    
-        regr = svm.SVR(kernel='rbf')
-        regr.fit(X_train, y_train)
+        print("Fitting SVR for arousal with selected parameters")
+
+        clf = svm.SVR(kernel="rbf", C=1)
+        clf.fit(X_train, y_train)
         
-        y_pred = regr.predict(X_test)
+        y_pred_ar = clf.predict(X_test)
         
-        print("Arousal scores: ")
-        print(concordance_correlation_coefficient(y_test, y_pred))
+        print("Arousal ccc: ")
+        print(concordance_correlation_coefficient(y_test, y_pred_ar))
     
     #SVR training and testing for valence
     y_train = valence_annotated_tr_labels.to_numpy()
     y_test = valence_GS_labels.to_numpy()
     
     if grid_search: 
-        regressors = {'svr_linear': svm.SVR(kernel='linear'),
-                      'svr_rbf': svm.SVR(kernel='rbf'),
-                      'svr_poly': svm.SVR(kernel='poly'), 
-                      'svr_sigmoid': svm.SVR(kernel='sigmoid')}
         
-        cv_mean_scores = []
-        cv_scores = []
-        cv_regressors = []
+        clf = svm.SVR()
         
-        for regr_name, regr in regressors.items():
-            
-            scores = cross_validate(regr, X_train, y_train, cv=5, scoring=ccc_scorer)
-            
-            cv_scores.append(scores["test_score"])
-            
-            mean_score = np.mean(scores["test_score"])
-            
-            cv_mean_scores.append(mean_score)
-            cv_regressors.append(regr_name)
-            
-            #regr.fit(X_train, y_train)
-            
-            
-        regr = regressors[cv_regressors[np.argmax(cv_mean_scores)]]
-        regr = regr.fit(X_train, y_train)
-        y_pred = regr.predict(X_test)
+        svr_linear = {'C': [0.1, 1, 10], 
+              'kernel': ['linear']} 
+        svr_others = {'C': [0.1, 1, 10],
+              'gamma': ['auto', 'scale'], 
+              'kernel': ['poly', 'rbf', 'sigmoid']}
         
+        param_grid = [svr_linear, svr_others]
         
-        print("Best valence regressor during CV: "+cv_regressors[np.argmax(cv_mean_scores)])
-        print(cv_regressors[np.argmax(cv_mean_scores)]+" valence CV scores: ")
-        #print(mean_squared_error(y_test, y_pred))
-        #print(mean_absolute_error(y_test, y_pred))
-        #print(r2_score(y_test, y_pred))
-        print(concordance_correlation_coefficient(y_test, y_pred))
+        # Perform GridSearchCV
+        grid_search = GridSearchCV(estimator=clf, param_grid=param_grid, cv=5, scoring=ccc_scorer, verbose=1)
+        
+        # Fit GridSearchCV
+        grid_search.fit(X_train, y_train)
+        
+        # Display best parameters and best score
+        print("Best Parameters:", grid_search.best_params_)
+        print("Best Cross-Validation CCC:", grid_search.best_score_)
+        
+        # Evaluate the best model on the test set
+        best_model_val = grid_search.best_estimator_
+        best_model_val.fit(X_train, y_train)
+        y_pred_val = best_model_val.predict(X_test)
+    
+        print("\nValence ccc:\n")
+        print(concordance_correlation_coefficient(y_test, y_pred_val))
     
     
+    
+    #train and test SVR regressor with constant parameters
     else:
-    
-        regr = svm.SVR(kernel='rbf')
-        regr.fit(X_train, y_train)
+        print("Fitting SVR for valence with selected parameters")
+
+        clf = svm.SVR(kernel="rbf", C=10, gamma="auto")
+        clf.fit(X_train, y_train)
         
-        y_pred = regr.predict(X_test)
+        y_pred_val = clf.predict(X_test)
         
-        print("Valence scores: ")
-        print(concordance_correlation_coefficient(y_test, y_pred))
+        print("Valence ccc: ")
+        print(concordance_correlation_coefficient(y_test, y_pred_val))
 
