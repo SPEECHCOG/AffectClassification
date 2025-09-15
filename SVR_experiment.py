@@ -5,10 +5,15 @@ Created on Mon Sep  1 16:30:00 2025
 
 @author: Kalle Lahtinen, kalle.t.lahtinen@tuni.fi
 
-This script implements the functions to execute training and testing for a Support Vector Machine regressor. 
+This script implements the functions to execute training and testing for a Support Vector Regression model. 
 The expected data is read in from csv-files, that contain the training and testing features as well as the continuous 
 sample labels arousal and valence. The script trains two separate 
-regressors for predicting the affect related continuous labels for arousal and valence.
+models for predicting the affect related continuous labels for arousal and valence.
+
+NOTE: The original data is NOT available at this moment. 
+The data will be published through Kielipankki.
+
+https://urn.fi/urn:nbn:fi:lb-2025081821 
     
 """
 

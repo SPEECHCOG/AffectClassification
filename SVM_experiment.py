@@ -9,6 +9,11 @@ This script implements the functions to execute training and testing for a Suppo
 The expected data is read in from csv-files, that contain the training and testing features as well as the 
 sample labels for high and low arousal as well as high, low and neutral valence. The script trains two separate 
 classifiers for predicting the affect related discrete labels for arousal and valence.
+
+NOTE: The original data is NOT available at this moment. 
+The data will be published through Kielipankki.
+
+https://urn.fi/urn:nbn:fi:lb-2025081821 
     
 """
 

@@ -7,10 +7,12 @@ Created on Fri Jan  3 12:30:32 2025
 
 This script uses the ExHuBERT model to predict high and low arousal and high, low and 
 neutral valence from raw audio waveforms. The model is downloaded from the Huggingface service
-and used as is, without fine-tuning.
+and used as is, without fine-tuning. This is a dummy example of the experiments.
 
-NOTE: The data required for running this script (raw audio 3 second windows)
-is NOT available at this moment.
+NOTE: The data required for running this script (raw audio)
+is NOT available at this moment. The data will be published through Kielipankki.
+
+https://urn.fi/urn:nbn:fi:lb-2025081821 
     
 """
 
