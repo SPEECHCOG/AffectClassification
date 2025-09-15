@@ -1,6 +1,6 @@
 # AffectClassification
 
-The python code files and data for running affect classification experiments on spontaneous speech features and data. There are three different experiments implemented. Unpack the data.zip, all the available data should then be in a directory called "data". The repository also contains regression experiment codes, added after the initial creation of the repository.
+The python code files and data for running affect classification experiments on spontaneous speech features and data. There are six different experiments implemented. Unpack the data.zip, all the available data should then be in a directory called "data". The repository also contains regression experiment codes, added after the initial creation of the repository.
 
 The data used for SVM and SVR experiments consists of eGeMAPSv02 features calculated using the original raw audio, previously calculated SER posteriors using the original raw audio and text sentiment posteriors using the original audio transcripts. 
 
