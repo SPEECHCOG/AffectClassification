@@ -128,7 +128,7 @@ if __name__ == '__main__':
     #continuous or discrete labels, in this script always discrete
     label_type = "discrete"
     sbatch_job = 0
-    num_epochs = 10
+    num_epochs = 100
         
     output_dir = data_storage_dir+"//"+"exhubert_finetuned_"+"_"+label_type+"_"+str(sbatch_job)
     
